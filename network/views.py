@@ -3,13 +3,14 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
+from django.core.paginator import Paginator
 from .models import User
 from .models import Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    allPosts= Post.objects.all().order_by('id').reverse()
+    return render(request, "network/index.html", {'allPosts': allPosts})
 
 
 def login_view(request):
@@ -34,7 +35,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("login"))
 
 
 def register(request):
