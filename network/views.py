@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.paginator import Paginator
-from .models import User
+from .models import Follow, User
 from .models import Post
 
 
@@ -74,3 +74,36 @@ def createPost(request):
         post = Post.objects.create(text=text, user=user)
         post.save()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def profileLoad(request,user):
+    # get user profile
+    openedUser=User.objects.get(pk=user)
+    allPosts=Post.objects.filter(user=user).order_by('id').reverse()
+    # get user followers
+    try:
+     following= Follow.objects.filter(user=user)
+    except Follow.DoesNotExist:
+     following   = None
+    try:
+     followers=Follow.objects.filter(userFollowed=user).values_list('userFollowed', flat=True)
+    except Follow.DoesNotExist:
+     followers   = None
+    return render(request, "network/profile.html", {'allPosts':allPosts,'openedUser':openedUser, 'following':following, 'followers':followers})
+
+
+def followUnfollow(request, user):
+    try:
+        followObj = Follow.objects.get(user=request.user.id, userFollowed=user)
+    except Follow.DoesNotExist:
+            try:
+                followedUser = User.objects.get(pk=user)
+            except followedUser.DoesNotExist:
+                return HttpResponse(status=404)
+            else:
+                newFollow = Follow(user=request.user, userFollowed=followedUser)
+                newFollow.save()
+    else:
+        followObj.delete()
+   
+    return HttpResponseRedirect(reverse("profile", args=[user]))

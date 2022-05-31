@@ -5,7 +5,11 @@ from django.db import models
 
 class User(AbstractUser):
     pass
-
+class Follow(models.Model):
+    #the follower
+    user= models.ForeignKey(User, on_delete=models.CASCADE, related_name="isFollowing")
+    #the user followed
+    userFollowed= models.ForeignKey(User, on_delete=models.CASCADE, related_name="isFollowed")
 class Post(models.Model):
     text = models.CharField(max_length=255)
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='author')

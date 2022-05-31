@@ -1,21 +1,25 @@
 {% extends "network/layout.html" %}
 {% block body %}
-{% if user.is_authenticated %}
-  <div id="newPostDiv">
-      <h1>New Post: </h1>
-        <form id="newPost" action="{% url 'createPost' %}"  method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <textarea id="newPostText" name="newPostText" placeholder="What's on your mind?"></textarea>
-            </div>
-            <input class="btn btn-primary" type="submit" value="Post">
-            <br><br>
-        </form>
-  </div>
-  <br>
-  <br>
-{% for post in allPosts %}
-    <div class="container">
+<h1>{{openedUser.username}}</h1>
+
+    {% if user.id != openedUser.id %}
+    {% if openedUser.id in followers %}
+    <form action="{% url 'followUnfollow' user=openedUser.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">UnFollow</button>
+    </form>
+    {% else %}
+    <form action="{% url 'followUnfollow' user=openedUser.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">follow</button>
+    </form>
+    {% endif %}
+    {% endif %}
+    <h2>Followers: {{followers.count}}</h2>
+    <h2>Following: {{following.count}}</h2>
+    <h1>All Posts : </h1>
+    {% for post in allPosts %}
+  <div class="container">
       <div class="row">
           <div class="col-md-8">
               <div class="post-content">
@@ -30,7 +34,7 @@
                     <div class="post-text">
                       <p>{{post.text}}</p>
                     </div>
-                    <div class="reaction">
+                      <div class="reaction">
                     <a class="btn text-green"><i class="fa fa-thumbs-up"></i> {{post.likes_count}}</a>
                     </div>
                     <div class="line-divider"></div>
@@ -41,5 +45,4 @@
       </div>
   </div>
   {% endfor %}
-  {% endif %}
 {% endblock %}
