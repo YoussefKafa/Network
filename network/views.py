@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.core.paginator import Paginator
 from .models import Follow, User
@@ -107,3 +107,16 @@ def followUnfollow(request, user):
         followObj.delete()
    
     return HttpResponseRedirect(reverse("profile", args=[user]))
+
+
+
+def following (request,user):
+  loggedUser= get_object_or_404(User, id=user)
+  followingList=Follow.objects.filter(user=loggedUser)
+  posts=Post.objects.all().order_by('id').reverse()
+  result=[]
+  for post in posts:
+      for follower in followingList:
+          if follower.userFollowed.id==post.user.id:
+              result.append(post)
+  return render(request, "network/following.html", {'allPosts':result})

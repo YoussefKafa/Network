@@ -1,0 +1,34 @@
+{% extends "network/layout.html" %}
+{% block body %}
+{% if user.is_authenticated %}
+{% for post in allPosts %}
+    <div class="container">
+      <div class="row">
+          <div class="col-md-8">
+              <div class="post-content">
+                <div class="post-container">
+                  <div class="post-detail">
+                    <div class="user-info">
+                      <h2><a href="{% url 'profile' user=post.user.id %}">{{post.user}}</a></h2>
+                    </div>
+                    <div class="user-info">
+                      <p class="text-muted">{{post.date}}</p>
+                    </div>
+                    <div class="post-text">
+                      <p>{{post.text}}</p>
+                    </div>
+                    <div class="reaction">
+                    <a class="btn text-green"><i class="fa fa-thumbs-up"></i> {{post.likes_count}}</a>
+                    </div>
+                    <div class="line-divider"></div>
+                  </div>
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  {% empty %}
+  <h1>You don't follow any user. There is nothing to display.</h1>
+  {% endfor %}
+{% endif %}
+{% endblock %}
