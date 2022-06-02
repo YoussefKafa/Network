@@ -10,7 +10,10 @@ from .models import Post
 
 def index(request):
     allPosts= Post.objects.all().order_by('id').reverse()
-    return render(request, "network/index.html", {'allPosts': allPosts})
+    pn = request.GET.get('page')
+    paginator= Paginator(allPosts, 10)
+    pageItems=paginator.get_page(pn)
+    return render(request, "network/index.html", {'allPosts': pageItems})
 
 
 def login_view(request):
@@ -89,7 +92,10 @@ def profileLoad(request,user):
      followers=Follow.objects.filter(userFollowed=user).values_list('userFollowed', flat=True)
     except Follow.DoesNotExist:
      followers   = None
-    return render(request, "network/profile.html", {'allPosts':allPosts,'openedUser':openedUser, 'following':following, 'followers':followers})
+    paginator=Paginator(allPosts,10)
+    pn=request.GET.get('page')
+    pageItems=paginator.get_page(pn)
+    return render(request, "network/profile.html", {'allPosts':pageItems,'openedUser':openedUser, 'following':following, 'followers':followers})
 
 
 def followUnfollow(request, user):
@@ -119,4 +125,7 @@ def following (request,user):
       for follower in followingList:
           if follower.userFollowed.id==post.user.id:
               result.append(post)
-  return render(request, "network/following.html", {'allPosts':result})
+  paginator=Paginator(result,10)
+  pn=request.GET.get('page')
+  pageItems=paginator.get_page(pn)
+  return render(request, "network/following.html", {'allPosts':pageItems})
