@@ -129,3 +129,11 @@ def following (request,user):
   pn=request.GET.get('page')
   pageItems=paginator.get_page(pn)
   return render(request, "network/following.html", {'allPosts':pageItems})
+
+def edit(request, postId):
+    if request.method == 'POST':
+        post = Post.objects.get(pk=postId)
+        newContent = request.POST["textarea"]
+        post.text = newContent
+        post.save()
+        return HttpResponse('success')

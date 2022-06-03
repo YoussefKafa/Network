@@ -15,31 +15,51 @@
   <br>
   <br>
 {% for post in allPosts %}
-    <div class="container">
-      <div class="row">
-          <div class="col-md-8">
-              <div class="post-content">
-                <div class="post-container">
-                  <div class="post-detail">
-                    <div class="user-info">
-                      <h2><a href="{% url 'profile' user=post.user.id %}">{{post.user}}</a></h2>
-                    </div>
-                    <div class="user-info">
-                      <p class="text-muted">{{post.date}}</p>
-                    </div>
-                    <div class="post-text">
-                      <p>{{post.text}}</p>
-                    </div>
-                    <div class="reaction">
-                    <a class="btn text-green"><i class="fa fa-thumbs-up"></i> {{post.likes_count}}</a>
-                    </div>
-                    <div class="line-divider"></div>
-                  </div>
-                </div>
-              </div>
+<div class="card border-secondary mb-3 post-object{{post.id}}">
+  <h5 class="card-header"><a href="{% url 'profile' user=post.user.id %}">{{post.user}}</a>
+    {% if request.user == post.user %}
+    <div class="delete-edit-panel">
+      <div class="dropdown">
+          <a class="btn icon-button" href="#" role="button" id="dropdownMenuLink_{{ post.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-three-dots" fill="rgb(101, 103, 107)" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+              </svg>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_{{ post.id }}">
+              <button class="dropdown-item dropdown-edit" data-toggle="modal" data-target="#edit">Edit</button>
           </div>
       </div>
   </div>
+  <div class="modal fade modal-edit" id="edit" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content new-post-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Edit publication</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form method=post action="{% url 'edit' postId=post.id %}">
+                {% csrf_token %}
+                <textarea rows="10" class="form-control textarea-edit" name="textarea">{{post.text}}</textarea>
+                <br>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-dark save edit-post" data-catid="{{post.id}}" type="submit" value="Save"><i class="fa fa-check-square-o"></i>Edit</button>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+    {% endif %}
+  </h5>
+  
+  <div class="card-body text-secondary">
+    <h6 class="card-subtitle mb-2 text-muted">{{post.date}}</h6>
+    <p class="card-text post-object-content{{post.id}}">{{post.text}}</p>
+  </div>
+</div>
   {% endfor %}
   {% endif %}
   <div class="container">
