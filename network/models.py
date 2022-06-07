@@ -14,8 +14,7 @@ class Post(models.Model):
     text = models.CharField(max_length=255)
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='author')
     date = models.DateTimeField(default=datetime.now())
-    liked = models.ManyToManyField('User', default=None, blank=True, related_name='post_likes')
-
+    liked = models.ManyToManyField('User', default=None, blank=True, related_name='likes')
     @property
     def likes_count(self):
         return self.liked.all().count()

@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from .models import Follow, User
 from .models import Post
+import json
 
 
 def index(request):
@@ -137,3 +138,16 @@ def edit(request, postId):
         post.text = newContent
         post.save()
         return HttpResponse('success')
+
+def like(request):
+    if request.method =="POST":
+         postId=request.POST.get("postId",None)
+         post=get_object_or_404(Post,pk=postId)
+         if post.liked.filter(id=request.user.id):
+            post.liked.remove(request.user)
+            liked=False
+         else:
+            post.liked.add(request.user) 
+            liked=True
+         ctx={"likes":post.likes_count,"liked":liked,"postId":postId}
+         return HttpResponse(json.dumps(ctx), content_type='application/json')

@@ -52,12 +52,18 @@
       </div>
     </div>
   </div>
-    {% endif %}
+  {% endif %}
   </h5>
-  
   <div class="card-body text-secondary">
     <h6 class="card-subtitle mb-2 text-muted">{{post.date}}</h6>
     <p class="card-text post-object-content{{post.id}}">{{post.text}}</p>
+    {% if request.user == post.user %}
+    {% elif request.user in post.liked.all %}
+    <a name="{{ post.id }}" style="font-size:20px;color: blue;" class="liking" id="co"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
+    {% else %}
+    <a name="{{ post.id }}" style="font-size:20px;color: black;" class="liking" id="co"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
+    {% endif %}
+    <p id="{{post.id}}" class="total-likes">Likes: {{post.liked.all.count}}</p>
   </div>
 </div>
   {% endfor %}
@@ -87,4 +93,30 @@
         {% endif %}
     </ul>
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+  $('.liking').click(function(){
+    $.ajax({
+             type: "POST",
+             url: "{% url 'like' %}",
+             data: {'postId': $(this).attr('name'),'operation':'like','csrfmiddlewaretoken': '{{ csrf_token }}'},
+             dataType: "json",
+             success: function(response) {
+              selector = document.getElementsByName(response.postId);
+                    if(response.liked==true){
+                      $(selector).css("color","blue");
+                    }
+                    else if(response.liked==false){
+                      $(selector).css("color","black");
+                    }
+              selector2=document.getElementById(response.postId);
+                       $(selector2).text("Likes: "+ response.likes)
+              }
+
+        });
+
+  })
+</script>
 {% endblock %}
